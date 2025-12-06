@@ -1,7 +1,8 @@
+import next from "next";
+
 export default function Home() {
   return (
     <>
-      {/* Your page content will go here */}
     </>
   );
 }
