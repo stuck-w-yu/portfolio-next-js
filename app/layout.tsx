@@ -20,49 +20,35 @@ export default function RootLayout({
     { label: "Profile", href: "#" },
     { label: "Project", href: "#" },
     { label: "About Me", href: "#" },
-    { label: "Contact", href: "#" }, // Typo fixed: Contacct -> Contact
+    { label: "Contacct", href: "#" },
   ];
-
   return (
     <html lang="en">
-      {/* Hapus tag <head> manual karena Next.js mengurusnya via 'metadata' di atas */}
-      
-      <body className={`${inter.className} relative`}>
-        
-        {/* 1. LightRays ditaruh di dalam body sebagai background */}
-        <div className="fixed inset-0 z-0 pointer-events-none">
-             <LightRays />
+      <body className={inter.className}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
+          <LightRays />
+        </div>
+        <div style={{ 
+          height: '600px', 
+          position: 'relative', 
+          marginLeft: 'auto', //
+          width: 'fit-content' // 
+          }}>
+          <GooeyNav
+          items={items}
+          particleCount={15}
+          particleDistances={[90, 10]}
+          particleR={100}
+          initialActiveIndex={0}
+          animationTime={600}
+          timeVariance={300}
+          colors={[1, 2, 3, 1, 2, 3, 1, 4]}
+          />
         </div>
 
-        {/* 2. Wrapper Utama agar konten ada di atas background */}
-        <div className="relative z-10">
-            
-            {/* Navbar */}
-            <div style={{ 
-              height: 'auto', // Tinggi jangan di-hardcode 600px, nanti konten ketutup
-              padding: '20px',
-              display: 'flex',
-              justifyContent: 'flex-end', // Cara CSS modern agar ke kanan
-             }}>
-                <GooeyNav
-                  items={items}
-                  particleCount={15}
-                  particleDistances={[90, 10]}
-                  particleR={100}
-                  initialActiveIndex={0}
-                  animationTime={600}
-                  timeVariance={300}
-                  colors={[1, 2, 3, 1, 2, 3, 1, 4]}
-                />
-            </div>
-
-            {/* Konten Halaman */}
-            <main className="min-h-screen">
-                {children}
-            </main>
-        </div>
-
-      </body>
+        {/* Konten halaman akan dirender di sini */}
+      <main className="min-h-screen bg-gray-50">{children}</main>
+        </body>
     </html>
   );
 }
