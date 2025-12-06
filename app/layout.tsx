@@ -20,21 +20,31 @@ export default function RootLayout({
     { label: "Profile", href: "#" },
     { label: "Project", href: "#" },
     { label: "About Me", href: "#" },
-    { label: "Contacct", href: "#" },
+    { label: "Contact", href: "#" },
   ];
+
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
+      {/* 1. Beri warna dasar gelap (bg-gray-900) agar LightRays terlihat kontras */}
+      <body className={`${inter.className} bg-gray-900 text-white`}>
+        
+        {/* 2. BACKGROUND LAYER */}
+        <div style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            width: '100%', 
+            height: '100%', 
+            zIndex: -1,
+            pointerEvents: 'none' // PENTING: Agar background tidak menghalangi klik mouse
+        }}>
           <LightRays />
         </div>
-        <div style={{ 
-          height: '600px', 
-          position: 'relative', 
-          marginLeft: 'auto', //
-          width: 'fit-content' // 
-          }}>
-          <GooeyNav
+        
+        {/* 3. NAVBAR */}
+        {/* Kita HAPUS wrapper <div style={{ position: 'fixed' ... }}> di sini. */}
+        {/* Alasannya: Logic 'fixed' dan 'auto-hide' sudah ada DI DALAM file GooeyNav.jsx */}
+        <GooeyNav
           items={items}
           particleCount={15}
           particleDistances={[90, 10]}
@@ -43,12 +53,15 @@ export default function RootLayout({
           animationTime={600}
           timeVariance={300}
           colors={[1, 2, 3, 1, 2, 3, 1, 4]}
-          />
-        </div>
+        />
 
-        {/* Konten halaman akan dirender di sini */}
-      <main className="min-h-screen bg-gray-50">{children}</main>
-        </body>
+        {/* 4. KONTEN HALAMAN */}
+        {/* Hapus class 'bg-gray-50' agar background menjadi transparan */}
+        <main className="min-h-screen relative z-0">
+            {children}
+        </main>
+        
+      </body>
     </html>
   );
 }

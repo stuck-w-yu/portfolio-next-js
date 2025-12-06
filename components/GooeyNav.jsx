@@ -3,14 +3,15 @@
 import { useRef, useEffect, useState } from 'react';
 import './GooeyNav.css';
 
-const items = [
-  { label: "Home", href: "#" },
-  { label: "About", href: "#" },
-  { label: "Contact", href: "#" },
+// Default items jika props kosong
+const DEFAULT_ITEMS = [
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const GooeyNav = ({
-  items,
+  items = DEFAULT_ITEMS,
   animationTime = 600,
   particleCount = 15,
   particleDistances = [90, 10],
@@ -23,8 +24,50 @@ const GooeyNav = ({
   const navRef = useRef(null);
   const filterRef = useRef(null);
   const textRef = useRef(null);
+  
   const [activeIndex, setActiveIndex] = useState(initialActiveIndex);
+  const [isVisible, setIsVisible] = useState(true); // State untuk visibilitas navbar
+  const [lastScrollY, setLastScrollY] = useState(0); // Menyimpan posisi scroll terakhir
 
+  // --- LOGIC AUTO HIDE & SHOW ---
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Logika: 
+      // 1. Jika di paling atas (scrollY < 50), selalu munculkan.
+      // 2. Jika scroll ke bawah (current > last) DAN scroll sudah agak jauh (> 50), sembunyikan.
+      // 3. Jika scroll ke atas, munculkan.
+      
+      if (currentScrollY < 50) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        setIsVisible(false); // Hide saat scroll down
+      } else {
+        setIsVisible(true);  // Show saat scroll up
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    const handleMouseMove = (e) => {
+      // Jika kursor berada di 100px teratas layar, munculkan navbar paksa
+      if (e.clientY < 100) {
+        setIsVisible(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [lastScrollY]);
+
+
+  // --- LOGIC PARTICLE (Original) ---
   const noise = (n = 1) => n / 2 - Math.random() * n;
 
   const getXY = (distance, pointIndex, totalPoints) => {
@@ -115,7 +158,6 @@ const GooeyNav = ({
 
     if (textRef.current) {
       textRef.current.classList.remove('active');
-
       void textRef.current.offsetWidth;
       textRef.current.classList.add('active');
     }
@@ -155,20 +197,36 @@ const GooeyNav = ({
   }, [activeIndex]);
 
   return (
-    <div className="gooey-nav-container" ref={containerRef}>
-      <nav>
-        <ul ref={navRef}>
-          {items.map((item, index) => (
-            <li key={index} className={activeIndex === index ? 'active' : ''}>
-              <a href={item.href} onClick={e => handleClick(e, index)} onKeyDown={e => handleKeyDown(e, index)}>
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <span className="effect filter" ref={filterRef} />
-      <span className="effect text" ref={textRef} />
+    // WRAPPER BARU UNTUK POSITION FIXED
+    <div 
+      style={{
+        position: 'fixed',
+        top: '20px',
+        right: '20px', // Posisi kanan
+        zIndex: 9999,
+        transition: 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Animasi smooth
+        transform: isVisible ? 'translateY(0)' : 'translateY(-200%)', // Logic sembunyi/muncul
+        // Jika hidden, kita matikan pointer events agar tidak mengganggu klik di bawahnya, 
+        // tapi mouse move event di window tetap bisa mendeteksi kursor di atas.
+        pointerEvents: isVisible ? 'auto' : 'none' 
+      }}
+    >
+        {/* COMPONENT GOOEY NAV ASLI */}
+        <div className="gooey-nav-container" ref={containerRef}>
+          <nav>
+            <ul ref={navRef}>
+              {items.map((item, index) => (
+                <li key={index} className={activeIndex === index ? 'active' : ''}>
+                  <a href={item.href} onClick={e => handleClick(e, index)} onKeyDown={e => handleKeyDown(e, index)}>
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <span className="effect filter" ref={filterRef} />
+          <span className="effect text" ref={textRef} />
+        </div>
     </div>
   );
 };
