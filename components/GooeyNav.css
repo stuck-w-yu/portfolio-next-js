@@ -1,11 +1,6 @@
 :root {
-  /* --- TAMBAHAN PENTING: Definisi Warna Partikel --- */
-  /* Anda bisa mengubah warna ini sesuai selera (hex/rgb/hsl) */
-  --color-1: #0000; /* Merah */
-  --color-2: #0000; /* Kuning */
-  --color-3: #0000; /* Hijau */
-  --color-4: #0000; /* Biru */
-  --color-5: #0000; /* Ungu */
+  /* Warna Partikel (Akan meledak saat diklik) */
+
 
   --linear-ease: linear(
     0, 0.068, 0.19 2.7%, 0.804 8.1%, 1.037, 1.199 13.2%, 1.245, 1.27 15.8%,
@@ -17,84 +12,55 @@
 
 .gooey-nav-container {
   position: relative;
-  /* Tambahan: Agar navbar tidak memanjang 100% layar jika tidak perlu */
   display: inline-block; 
-  /* Tambahan: Agar background hitam dari efek filter tidak bocor keluar kotak */
+  /* Background Container Gelap agar efek kaca terlihat */
+  background: rgba(255, 255, 255, 0); 
   border-radius: 2rem; 
-  background: #000; /* Warna dasar navbar (agar kontras dengan teks putih) */
-  padding: 5px; /* Memberi sedikit ruang napas */
+  padding: 8px; 
+  /* Border tipis container */
+  border: 1px solid rgba(36, 35, 35, 0.473);
+  backdrop-filter: blur(15px);
 }
 
 .gooey-nav-container nav {
   display: flex;
   position: relative;
-  transform: translate3d(0, 0, 0.01px);
+  z-index: 10;
 }
 
 .gooey-nav-container nav ul {
   display: flex;
-  gap: 2em;
+  gap: 1.5em; /* Jarak antar menu */
   list-style: none;
   padding: 0 1em;
   margin: 0;
   position: relative;
   z-index: 3;
-  color: white; /* Warna teks default */
-  /* Text shadow opsional, dihapus jika ingin lebih bersih */
-  text-shadow: 0 1px 1px hsl(205deg 30% 10% / 0.2);
 }
 
 .gooey-nav-container nav ul li {
-  border-radius: 100vw;
   position: relative;
   cursor: pointer;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease,
-    box-shadow 0.3s ease;
-  /* Garis tipis transparan */
-  box-shadow: 0 0 0.5px 1.5px transparent;
-  color: white;
-  /* Mencegah teks terpilih saat klik cepat */
+  color: #a0a0a0; /* Warna teks tidak aktif (abu-abu) */
+  transition: color 0.3s ease;
   user-select: none; 
+  font-weight: 500;
 }
 
 .gooey-nav-container nav ul li a {
   display: inline-block;
-  padding: 0.6em 1em;
-  text-decoration: none; /* Hilangkan garis bawah link */
-  color: inherit; /* Ikuti warna li */
+  padding: 0.6em 1.2em;
+  text-decoration: none;
+  color: inherit;
 }
 
-/* Aksesibilitas keyboard */
-.gooey-nav-container nav ul li:focus-within:has(:focus-visible) {
-  box-shadow: 0 0 0.5px 1.5px white;
-}
-
-/* Background putih saat hover/active (Layer paling bawah) */
-.gooey-nav-container nav ul li::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 10px; /* Sesuaikan kelengkungan kotak hover */
-  background: white;
-  opacity: 0;
-  transform: scale(0);
-  transition: all 0.3s ease;
-  z-index: -1;
-}
-
+/* State Aktif untuk Teks */
 .gooey-nav-container nav ul li.active {
-  color: black; /* Warna teks saat aktif menjadi hitam */
-  text-shadow: none;
+  color: rgb(58, 56, 56); /* Putih terang saat aktif */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Efek glow teks */
 }
 
-.gooey-nav-container nav ul li.active::after {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* --- LOGIC EFEK GOOEY --- */
+/* --- LOGIC EFEK GLASS (Pointer) --- */
 
 .gooey-nav-container .effect {
   position: absolute;
@@ -102,135 +68,84 @@
   top: 0;
   width: 0;
   height: 0;
-  opacity: 1;
   pointer-events: none;
-  display: grid;
-  place-items: center;
   z-index: 1;
 }
 
-.gooey-nav-container .effect.text {
-  color: white;
-  transition: color 0.3s ease;
-  /* Penting: Agar teks duplikat tidak mengganggu layout */
-  white-space: nowrap; 
-  pointer-events: none;
-}
-
-.gooey-nav-container .effect.text.active {
-  color: black;
-}
-
-/* Bagian Filter Utama */
+/* Container filter (Dulu untuk gooey, sekarang untuk positioning kaca) */
 .gooey-nav-container .effect.filter {
-  /* Ini rahasia efek gooey: Blur + High Contrast */
-  filter: blur(7px) contrast(100) blur(0);
-  mix-blend-mode: lighten; /* Mencampur dengan background hitam */
+  filter: none; /* Gooey dimatikan */
+  opacity: 1;
+  mix-blend-mode: normal;
 }
 
-/* Background hitam besar di belakang filter untuk support contrast */
-.gooey-nav-container .effect.filter::before {
-  content: '';
-  position: absolute;
-  inset: -75px; /* Area efek lebih besar dari navbar */
-  z-index: -2;
-  background: black; 
-}
-
-/* Lingkaran putih yang membesar (Pill) */
+/* Kaca yang bergerak (The Glass Pill) */
 .gooey-nav-container .effect.filter::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: white;
+  
+  /* Style Kaca */
+  background: rgba(255, 255, 255, 0.1); /* Putih transparan */
+  backdrop-filter: blur(10px);          /* Efek Blur belakang */
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Garis tepi kaca */
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.1),
+    inset 0 0 10px rgba(255, 255, 255, 0.05); /* Kilau dalam */
+  
   transform: scale(0);
   opacity: 0;
   z-index: -1;
-  border-radius: 100vw;
+  border-radius: 2rem;
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+/* Saat aktif, kaca muncul */
 .gooey-nav-container .effect.active::after {
-  animation: pill 0.3s ease both;
+  transform: scale(1);
+  opacity: 1;
 }
 
-@keyframes pill {
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+/* Helper Text (untuk sizing, hidden visualnya) */
+.gooey-nav-container .effect.text {
+  opacity: 0; /* Sembunyikan helper text karena kita pakai text asli */
+  pointer-events: none;
 }
 
-/* --- PARTIKEL & ANIMASI --- */
+/* --- PARTIKEL (Ledakan Kecil) --- */
 
-.particle,
-.point {
+.particle, .point {
   display: block;
   opacity: 0;
-  width: 20px;
-  height: 20px;
+  width: 10px;
+  height: 10px;
   border-radius: 100%;
   transform-origin: center;
+  pointer-events: none;
 }
 
 .particle {
   --time: 5s;
   position: absolute;
-  top: calc(50% - 8px);
-  left: calc(50% - 8px);
-  animation: particle calc(var(--time)) ease 1 -350ms;
+  top: 50%;
+  left: 50%;
+  animation: particle calc(var(--time)) ease 1 forwards;
 }
 
 .point {
-  /* Menggunakan variable warna yang didefinisikan di :root */
-  background: var(--color); 
-  opacity: 1;
-  animation: point calc(var(--time)) ease 1 -350ms;
+  background: var(--color);
+  box-shadow: 0 0 8px var(--color); /* Glow partikel */
+  animation: point calc(var(--time)) ease 1 forwards;
 }
 
 @keyframes particle {
-  0% {
-    transform: rotate(0deg) translate(calc(var(--start-x)), calc(var(--start-y)));
-    opacity: 1;
-    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
-  }
-  70% {
-    transform: rotate(calc(var(--rotate) * 0.5)) translate(calc(var(--end-x) * 1.2), calc(var(--end-y) * 1.2));
-    opacity: 1;
-    animation-timing-function: ease;
-  }
-  85% {
-    transform: rotate(calc(var(--rotate) * 0.66)) translate(calc(var(--end-x)), calc(var(--end-y)));
-    opacity: 1;
-  }
-  100% {
-    transform: rotate(calc(var(--rotate) * 1.2)) translate(calc(var(--end-x) * 0.5), calc(var(--end-y) * 0.5));
-    opacity: 1;
-  }
+  0% { transform: translate(-50%, -50%) rotate(0deg) translate(0, 0); opacity: 1; }
+  100% { transform: translate(-50%, -50%) rotate(var(--rotate)) translate(var(--end-x), var(--end-y)); opacity: 0; }
 }
 
 @keyframes point {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
-  }
-  25% {
-    transform: scale(calc(var(--scale) * 0.25));
-  }
-  38% {
-    opacity: 1;
-  }
-  65% {
-    transform: scale(var(--scale));
-    opacity: 1;
-    animation-timing-function: ease;
-  }
-  85% {
-    transform: scale(var(--scale));
-    opacity: 1;
-  }
-  100% {
-    transform: scale(0);
-    opacity: 0;
-  }
+  0% { transform: scale(0); opacity: 1; }
+  30% { transform: scale(var(--scale)); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; }
 }
