@@ -3,7 +3,21 @@
 import { useState } from 'react';
 import './Folder.css';
 
-const darkenColor = (hex, percent) => {
+// 1. Definisikan tipe data untuk item di dalam folder
+interface FolderItem {
+  link: string;
+  icon: React.ReactNode; // React.ReactNode mengizinkan SVG/JSX element
+}
+
+// 2. Definisikan tipe props untuk komponen Folder
+interface FolderProps {
+  color?: string;
+  size?: number;
+  items?: FolderItem[]; // Disini kuncinya: memberitahu TS bahwa ini array object
+  className?: string;
+}
+
+const darkenColor = (hex: string, percent: number) => {
   let color = hex.startsWith('#') ? hex.slice(1) : hex;
   if (color.length === 3) {
     color = color
@@ -21,11 +35,15 @@ const darkenColor = (hex, percent) => {
   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
 };
 
-const Folder = ({ color = '#5227FF', size = 1, items = [], className = '' }) => {
+// 3. Pasang tipe FolderProps di sini
+const Folder = ({ color = '#5227FF', size = 1, items = [], className = '' }: FolderProps) => {
   const maxItems = 3;
-  // Pastikan items diambil 3 teratas, sisanya null
+  
+  // Logic items
   const papers = items.slice(0, maxItems);
+  // @ts-ignore - Kita ignore sebentar trick push null untuk styling sisa kertas
   while (papers.length < maxItems) {
+    // @ts-ignore
     papers.push(null);
   }
 
@@ -44,7 +62,7 @@ const Folder = ({ color = '#5227FF', size = 1, items = [], className = '' }) => 
     }
   };
 
-  const handlePaperMouseMove = (e, index) => {
+  const handlePaperMouseMove = (e: React.MouseEvent, index: number) => {
     if (!open) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
@@ -58,7 +76,7 @@ const Folder = ({ color = '#5227FF', size = 1, items = [], className = '' }) => 
     });
   };
 
-  const handlePaperMouseLeave = (e, index) => {
+  const handlePaperMouseLeave = (e: React.MouseEvent, index: number) => {
     setPaperOffsets(prev => {
       const newOffsets = [...prev];
       newOffsets[index] = { x: 0, y: 0 };
@@ -72,7 +90,7 @@ const Folder = ({ color = '#5227FF', size = 1, items = [], className = '' }) => 
     '--paper-1': paper1,
     '--paper-2': paper2,
     '--paper-3': paper3
-  };
+  } as React.CSSProperties;
 
   const folderClassName = `folder ${open ? 'open' : ''}`.trim();
   const scaleStyle = { transform: `scale(${size})` };
@@ -90,25 +108,25 @@ const Folder = ({ color = '#5227FF', size = 1, items = [], className = '' }) => 
               style={
                 open
                   ? {
+                      // @ts-ignore - Custom CSS Properties
                       '--magnet-x': `${paperOffsets[i]?.x || 0}px`,
                       '--magnet-y': `${paperOffsets[i]?.y || 0}px`,
-                      display: 'flex',            // Tambahan styling agar icon di tengah
+                      display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                     }
                   : { display: 'flex', alignItems: 'center', justifyContent: 'center' }
               }
             >
-              {/* LOGIKA BARU: Cek apakah item ada dan render Link + Icon */}
-              {item ? (
+              {/* Type Guard: Pastikan item tidak null sebelum akses .link */}
+              {item && (typeof item === 'object') ? (
                 <a 
                     href={item.link} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()} // PENTING: Agar folder tidak close saat link diklik
+                    onClick={(e) => e.stopPropagation()} 
                     className="w-full h-full flex items-center justify-center text-gray-700 hover:text-blue-600 transition-colors"
                 >
-                    {/* Render Icon SVG */}
                     {item.icon}
                 </a>
               ) : null}
