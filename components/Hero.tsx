@@ -2,8 +2,12 @@
 
 import { useState } from 'react';
 import { TypeAnimation } from 'react-type-animation';
-// @ts-ignore - Abaikan error tipe jika TextType masih .jsx
+// @ts-ignore
 import TextType from './TextType'; 
+import Folder from './Folder'; // Pastikan path import sesuai
+
+// Import Icon dari react-icons (atau bisa pakai SVG manual)
+import { FaGithub, FaLinkedin, FaInstagram, FaEnvelope, FaInstagramSquare } from 'react-icons/fa';
 
 const content = {
   intro: {
@@ -21,19 +25,33 @@ const content = {
     usp: "Full Stack Developer.",
   },
   paragraph: "I focus on building responsive, high-performance web applications using modern technologies like Next.js, React, and Tailwind CSS.",
-  buttons: {
-    primary: { title: "Contact Me", url: "mailto:email@example.com" },
-    secondary: { title: "LinkedIn", url: "https://linkedin.com/in/username" }
-  }
 };
 
 export default function Hero() {
+  
+  // 1. Definisikan data untuk isi Folder (Link & Icon)
+  // Folder logic kita membatasi max 3 item agar visualnya bagus
+  const socialItems = [
+    {
+      link: 'https://github.com/stuck-w-yu',
+      icon: <FaGithub className="text-6xl text-gray-800" /> // text-4xl agar icon besar
+    },
+    {
+      link: 'https://linkedin.com/in/username',
+      icon: <FaLinkedin className="text-6xl text-gray-600" />
+    },
+    {
+      link: 'https://www.instagram.com/stuckw.yu_',
+      icon: <FaInstagramSquare className="text-6xl text-gray-500" />
+    }
+  ];
+
   return (
     <section className="w-full min-h-screen flex items-center justify-center relative z-10 pt-20">
-      <div className="container mx-auto px-6 md:px-12 text-left">
+      <div className="container mx-auto px-6 md:px-12 text-left ">
         
-        {/* 1. Type Animation (Intro Kecil) - Tetap pakai library ini karena array sequence-nya kompleks */}
-        <div className="mb-4 h-8">
+        {/* 1. Type Animation */}
+        <div className="text-[15px] mb-4 h-8 text-center">
             <TypeAnimation
               sequence={content.intro.sequence}
               speed={50} 
@@ -43,16 +61,16 @@ export default function Hero() {
             />
         </div>
 
-        {/* 2. Main Header (Nama) - Pakai TextType Custom Anda */}
+        {/* 2. Main Header (Nama) */}
         <div className="space-y-2 mb-8">
-            <div className="text-5xl md:text-7xl font-extrabold text-white tracking-tight">
+            <div className="text-[60px] md:text-7xl font-extrabold text-white tracking-tight text-center">
                 <TextType 
                     text={content.header.name}
-                    as="h1"             // Render sebagai h1
-                    typingSpeed={100}   // Kecepatan ketik
-                    startOnVisible={true} // Mulai saat terlihat
+                    as="h1"            
+                    typingSpeed={100}   
+                    startOnVisible={true} 
                     showCursor={true}
-                    loop={false}        // PENTING: Agar tidak menghapus text setelah selesai
+                    loop={false}        
                     cursorCharacter="|"
                     variableSpeed={null} 
                     onSentenceComplete={null}
@@ -60,14 +78,14 @@ export default function Hero() {
             </div>
 
             {/* 3. Sub Header (Job Title) */}
-            <div className="text-4xl md:text-6xl font-bold text-gray-400">
+            <div className="text-7xl md:text-6xl font-bold text-gray-400 text-center">
                 <TextType 
                     text={content.header.usp}
                     as="h1"
-                    initialDelay={1500} // Tunggu nama selesai dulu baru ketik ini
+                    initialDelay={1500} 
                     typingSpeed={80}
                     showCursor={true}
-                    loop={false}        // Jangan looping
+                    loop={false}        
                     cursorCharacter="|"
                     variableSpeed={null} 
                     onSentenceComplete={null}
@@ -76,34 +94,31 @@ export default function Hero() {
         </div>
 
         {/* 4. Paragraph */}
-        <div className="max-w-2xl mb-10 text-lg md:text-xl text-gray-300 leading-relaxed min-h-[100px]">
+        <div className="text-[16px] max-w-2xl mb-10 text-lg md:text-xl text-gray-300 leading-relaxed min-h-[100px] text-center mx-auto">
             <TextType 
                 text={content.paragraph}
                 as="p"
-                initialDelay={3000} // Tunggu judul selesai
-                typingSpeed={30}    // Lebih cepat karena teks panjang
-                showCursor={false}  // Cursor dimatikan agar lebih rapi untuk paragraf
-                loop={false}
+                initialDelay={3000} 
+                typingSpeed={30}    
+                showCursor={false}  
+                loop={true}
             />
         </div>
 
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4">
-            <a 
-                href={content.buttons.primary.url}
-                className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition-all duration-300 shadow-lg hover:shadow-blue-500/50 text-center"
-            >
-                {content.buttons.primary.title}
-            </a>
-
-            <a 
-                href={content.buttons.secondary.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full backdrop-blur-md border border-white/10 transition-all duration-300 hover:border-white/30 text-center"
-            >
-                {content.buttons.secondary.title}
-            </a>
+        {/* 5. Folder Component (Social Links) */}
+        <div className="flex justify-center items-center mt-12 h-40"> 
+            {/* Note: h-40 ditambahkan agar ada ruang untuk animasi folder saat terbuka */}
+            
+            <Folder 
+                size={1}           // Skala ukuran folder
+                color="#828283"      // Warna folder (Biru modern)
+                items={socialItems}  // Masukkan data link & icon di sini
+                className="cursor-pointer" 
+            />
+            
+            {/* Hint Text (Opsional, agar user tahu folder bisa diklik) */}
+            <p className="absolute mt-32 text-xs text-gray-500 opacity-50 animate-pulse">
+            </p>
         </div>
 
       </div>
