@@ -54,6 +54,8 @@ export default function Hero() {
                     showCursor={true}
                     loop={false}        // PENTING: Agar tidak menghapus text setelah selesai
                     cursorCharacter="|"
+                    variableSpeed={null} 
+                    onSentenceComplete={null}
                 />
             </div>
 
@@ -67,6 +69,8 @@ export default function Hero() {
                     showCursor={true}
                     loop={false}        // Jangan looping
                     cursorCharacter="|"
+                    variableSpeed={null} 
+                    onSentenceComplete={null}
                 />
             </div>
         </div>
