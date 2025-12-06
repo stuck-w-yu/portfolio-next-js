@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { TypeAnimation } from 'react-type-animation';
-import TextType from './TextType';
+// @ts-ignore - Abaikan error tipe jika TextType masih .jsx
+import TextType from './TextType'; 
 
 const content = {
   intro: {
@@ -14,10 +15,8 @@ const content = {
       'I solve complex problems.', 
       2000,
     ],
-    speed: 50,
-    wrapper: 'span',
   },
-  header: { 
+  header: {
     name: "Hi, I'm Yu.",
     usp: "Full Stack Developer.",
   },
@@ -29,13 +28,11 @@ const content = {
 };
 
 export default function Hero() {
-  const [typingStatus, setTypingStatus] = useState('Initializing');
-
   return (
     <section className="w-full min-h-screen flex items-center justify-center relative z-10 pt-20">
       <div className="container mx-auto px-6 md:px-12 text-left">
         
-        {/* Type Animation Section */}
+        {/* 1. Type Animation (Intro Kecil) - Tetap pakai library ini karena array sequence-nya kompleks */}
         <div className="mb-4 h-8">
             <TypeAnimation
               sequence={content.intro.sequence}
@@ -46,37 +43,45 @@ export default function Hero() {
             />
         </div>
 
-        {/* Main Header */}
+        {/* 2. Main Header (Nama) - Pakai TextType Custom Anda */}
         <div className="space-y-2 mb-8">
-            <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight">
+            <div className="text-5xl md:text-7xl font-extrabold text-white tracking-tight">
                 <TextType 
                     text={content.header.name}
-                    typingSpeed={75}
-                    pauseDuration={1500}
+                    as="h1"             // Render sebagai h1
+                    typingSpeed={100}   // Kecepatan ketik
+                    startOnVisible={true} // Mulai saat terlihat
                     showCursor={true}
+                    loop={false}        // PENTING: Agar tidak menghapus text setelah selesai
                     cursorCharacter="|"
                 />
-            </h1>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-400">
+            </div>
+
+            {/* 3. Sub Header (Job Title) */}
+            <div className="text-4xl md:text-6xl font-bold text-gray-400">
                 <TextType 
                     text={content.header.usp}
-                    typingSpeed={75}
-                    pauseDuration={1500}
+                    as="h1"
+                    initialDelay={1500} // Tunggu nama selesai dulu baru ketik ini
+                    typingSpeed={80}
                     showCursor={true}
+                    loop={false}        // Jangan looping
                     cursorCharacter="|"
                 />
-            </h1>
+            </div>
         </div>
 
-        {/* Paragraph */}
-
-        <TextType 
-            text={content.paragraph}
-            typingSpeed={75}
-            pauseDuration={1500}
-            showCursor={true}
-            cursorCharacter="|"
-        />
+        {/* 4. Paragraph */}
+        <div className="max-w-2xl mb-10 text-lg md:text-xl text-gray-300 leading-relaxed min-h-[100px]">
+            <TextType 
+                text={content.paragraph}
+                as="p"
+                initialDelay={3000} // Tunggu judul selesai
+                typingSpeed={30}    // Lebih cepat karena teks panjang
+                showCursor={false}  // Cursor dimatikan agar lebih rapi untuk paragraf
+                loop={false}
+            />
+        </div>
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">

@@ -1,12 +1,14 @@
 .text-type {
   display: inline-block;
-  white-space: pre-wrap;
+  white-space: pre-wrap; /* Agar spasi dan enter terbaca */
 }
 
 .text-type__cursor {
   margin-left: 0.25rem;
   display: inline-block;
   opacity: 1;
+  font-weight: 100; /* Opsional: Agar kursor lebih tipis elegan */
+  color: inherit;   /* Opsional: Agar warna kursor mengikuti warna teks */
 }
 
 .text-type__cursor--hidden {
