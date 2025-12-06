@@ -1,8 +1,31 @@
 'use client';
 
-import { useEffect, useRef, useState, createElement, useMemo, useCallback } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback, createElement, ElementType } from 'react';
 import { gsap } from 'gsap';
 import './TextType.css';
+
+// Definisi Tipe Data Props (Interface)
+interface TextTypeProps {
+  text: string | string[];
+  as?: ElementType;
+  typingSpeed?: number;
+  initialDelay?: number;
+  pauseDuration?: number;
+  deletingSpeed?: number;
+  loop?: boolean;
+  className?: string;
+  showCursor?: boolean;
+  hideCursorWhileTyping?: boolean;
+  cursorCharacter?: string;
+  cursorClassName?: string;
+  cursorBlinkDuration?: number;
+  textColors?: string[];
+  // Tanda tanya (?) berarti properti ini TIDAK WAJIB
+  variableSpeed?: { min: number; max: number } | null; 
+  onSentenceComplete?: ((text: string, index: number) => void) | null;
+  startOnVisible?: boolean;
+  reverseMode?: boolean;
+}
 
 const TextType = ({
   text,
@@ -19,19 +42,19 @@ const TextType = ({
   cursorClassName = '',
   cursorBlinkDuration = 0.5,
   textColors = [],
-  variableSpeed,
-  onSentenceComplete,
+  variableSpeed = null,       // Default null agar tidak wajib
+  onSentenceComplete = null,  // Default null agar tidak wajib
   startOnVisible = false,
   reverseMode = false,
   ...props
-}) => {
+}: TextTypeProps) => {
   const [displayedText, setDisplayedText] = useState('');
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(!startOnVisible);
-  const cursorRef = useRef(null);
-  const containerRef = useRef(null);
+  const cursorRef = useRef<HTMLSpanElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
 
   const textArray = useMemo(() => (Array.isArray(text) ? text : [text]), [text]);
 
@@ -42,7 +65,7 @@ const TextType = ({
   }, [variableSpeed, typingSpeed]);
 
   const getCurrentTextColor = () => {
-    if (textColors.length === 0) return;
+    if (textColors.length === 0) return undefined;
     return textColors[currentTextIndex % textColors.length];
   };
 
@@ -80,7 +103,7 @@ const TextType = ({
   useEffect(() => {
     if (!isVisible) return;
 
-    let timeout;
+    let timeout: NodeJS.Timeout;
     const currentText = textArray[currentTextIndex];
     const processedText = reverseMode ? currentText.split('').reverse().join('') : currentText;
 
